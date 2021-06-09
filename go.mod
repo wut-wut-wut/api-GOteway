@@ -1,4 +1,4 @@
-module raven/api-gotway
+module wut/api-goteway
 
 go 1.16
 
