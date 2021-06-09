@@ -37,7 +37,7 @@ func DoRequest(f *FilterContext, w http.ResponseWriter, r *http.Request) {
 		}
 		//Convert the body to type string
 		sb := string(body)
-		fmt.Fprintf(w, sb)
+		fmt.Fprint(w, sb)
 	}
 
 }
