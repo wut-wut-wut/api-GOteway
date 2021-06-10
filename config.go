@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -11,6 +10,7 @@ import (
 
 type Config struct {
 	Routes []RouteConfig
+	Server ServerConfig
 }
 
 type RouteConfig struct {
@@ -25,12 +25,17 @@ type FilterConfig struct {
 	Properties map[string]string
 }
 
+type ServerConfig struct {
+	Port     string
+	CertFile string `yaml:"cert-file"`
+	KeyFile  string `yaml:"key-file"`
+}
+
 func GetConfig() Config {
 
 	var configPath string
 	flag.StringVar(&configPath, "config", "", "Usage")
 	flag.Parse()
-	fmt.Println(configPath)
 
 	c := Config{}
 

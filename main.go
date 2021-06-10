@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"regexp"
 )
@@ -40,7 +41,18 @@ func main() {
 		}
 	})
 
-	http.ListenAndServe(":8000", nil)
+	var err error = nil
+	if len(c.Server.CertFile) > 0 {
+		log.Printf("Starting server on https://localhost:%s", c.Server.Port)
+		err = http.ListenAndServeTLS(":"+c.Server.Port, c.Server.CertFile, c.Server.KeyFile, nil)
+	} else {
+		log.Printf("Starting server on http://localhost:%s", c.Server.Port)
+		err = http.ListenAndServe(":"+c.Server.Port, nil)
+	}
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func getMatchingRoute(path string, routes []RouteConfig) *RouteConfig {
