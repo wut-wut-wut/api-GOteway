@@ -13,7 +13,7 @@ type FilterContext struct {
 }
 
 type RouteFilter interface {
-	Process(f *FilterContext) bool
+	Process(f *FilterContext, w http.ResponseWriter, r *http.Request) error
 }
 
 func main() {
@@ -36,11 +36,11 @@ func main() {
 	}
 }
 
-func InitFilters(rc []RouteConfig) []RouteFilter {
-	rfs := make([]RouteFilter, 1)
+func InitFilters(rc []RouteConfig) map[string]RouteFilter {
+	rfs := make(map[string]RouteFilter)
 
-	var rf RouteFilter = StripPrefixFilter{}
-	rfs[0] = rf
+	rfs["StripPrefixFilter"] = StripPrefixFilter{}
+	rfs["BasicAuthFilter"] = BasicAuthFilter{}
 
 	return rfs
 }

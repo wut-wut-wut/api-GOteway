@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/http"
 	"strconv"
 	"strings"
 )
@@ -8,7 +9,7 @@ import (
 type StripPrefixFilter struct {
 }
 
-func (spf StripPrefixFilter) Process(f *FilterContext) bool {
+func (spf StripPrefixFilter) Process(f *FilterContext, w http.ResponseWriter, r *http.Request) error {
 	depth, exists := f.Filter.Properties["depth"]
 	d, _ := strconv.Atoi(depth)
 	if exists {
@@ -27,5 +28,5 @@ func (spf StripPrefixFilter) Process(f *FilterContext) bool {
 			f.RequestURI = `/`
 		}
 	}
-	return true
+	return nil
 }

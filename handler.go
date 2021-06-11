@@ -6,7 +6,7 @@ import (
 	"regexp"
 )
 
-func commonHandler(f []RouteFilter, c Config) http.HandlerFunc {
+func commonHandler(f map[string]RouteFilter, c Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		route := getMatchingRoute(r.URL.Path, c.Routes)
 
@@ -14,15 +14,28 @@ func commonHandler(f []RouteFilter, c Config) http.HandlerFunc {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		} else {
 			fc := FilterContext{}
-			fc.Filter = &route.Filters[0]
 			fc.RequestURI = r.URL.RequestURI()
 			fc.TargetURL = route.Url
 
-			for _, filter := range f {
-				filter.Process(&fc)
+			var err error = nil
+
+			// Apply all the configured filters associate to the Route
+			for _, filterConfig := range route.Filters {
+				filter, ok := f[filterConfig.Name]
+				if ok {
+					fc.Filter = &filterConfig
+					err = filter.Process(&fc, w, r)
+
+					// Dont process the other filters if last one returned an error
+					if err != nil {
+						break
+					}
+				}
 			}
 
-			DoRequest(&fc, w, r)
+			if err == nil {
+				DoRequest(&fc, w, r)
+			}
 		}
 	}
 }
